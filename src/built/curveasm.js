@@ -13363,7 +13363,14 @@ var Module = (function () {
     // Given a pointer 'ptr' to a null-terminated UTF16LE-encoded string in the emscripten HEAP, returns
     // a copy of that string as a Javascript String object.
 
-    var UTF16Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-16le') : undefined
+    var UTF16Decoder = typeof TextDecoder !== 'undefined' ? (() => {
+    try {
+      return new TextDecoder('utf-16le');
+    } catch (e) {
+      // Hermes doesn't support UTF-16LE, use fallback
+      return undefined;
+    }
+    })() : undefined;
 
     function UTF16ToString(ptr, maxBytesToRead) {
       var endPtr = ptr
